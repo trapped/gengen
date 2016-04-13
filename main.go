@@ -95,9 +95,11 @@ func render(text string, packages map[string]*ast.Package) string {
 }
 
 func main() {
-	sourceDir := flag.String("d", "", "Directory to parse files from")
-	templateFile := flag.String("t", "", "Template to render")
-	outFile := flag.String("o", "", "Output filename")
+	var (
+		sourceDir    *string = flag.String("d", "", "Directory to parse files from")
+		templateFile *string = flag.String("t", "", "Template to render")
+		outFile      *string = flag.String("o", "", "Output filename")
+	)
 	flag.Parse()
 	if *sourceDir == "" {
 		fmt.Fprintf(os.Stderr, "Please specify a source directory\n")
