@@ -74,11 +74,21 @@ func readTemplate(path string) string {
 	return string(data)
 }
 
+func findFirstType(scope *ast.Scope) *ast.Object {
+	for _, obj := range scope.Objects {
+		if obj.Kind == ast.Typ {
+			return obj
+		}
+	}
+	return nil
+}
+
 func render(text string, packages map[string]*ast.Package) string {
 	funcMap := template.FuncMap{
-		"ToUpper": strings.ToUpper,
-		"ToLower": strings.ToLower,
-		"ToTitle": strings.ToTitle,
+		"ToUpper":       strings.ToUpper,
+		"ToLower":       strings.ToLower,
+		"ToTitle":       strings.ToTitle,
+		"FindFirstType": findFirstType,
 	}
 	tmpl, err := template.New("render").Funcs(funcMap).Parse(text)
 	if err != nil {
