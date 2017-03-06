@@ -75,7 +75,12 @@ func readTemplate(path string) string {
 }
 
 func render(text string, packages map[string]*ast.Package) string {
-	tmpl, err := template.New("render").Parse(text)
+	funcMap := template.FuncMap{
+		"ToUpper": strings.ToUpper,
+		"ToLower": strings.ToLower,
+		"ToTitle": strings.ToTitle,
+	}
+	tmpl, err := template.New("render").Funcs(funcMap).Parse(text)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error while parsing template: %v\n", err.Error())
 		os.Exit(1)
