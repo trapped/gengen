@@ -82,11 +82,16 @@ func readTemplate(path string) string {
 	return string(data)
 }
 
-func findTypes(pkg *ast.Package) []*ast.Object {
+func findStructs(pkg *ast.Package) []*ast.Object {
 	objs := make([]*ast.Object, 0)
 	for _, file := range pkg.Files {
 		for _, obj := range file.Scope.Objects {
-			if obj.Kind == ast.Typ {
+			typespec, is_typespec := obj.Decl.(*ast.TypeSpec)
+			is_struct := false
+			if is_typespec {
+				_, is_struct = typespec.Type.(*ast.StructType)
+			}
+			if obj.Kind == ast.Typ && is_struct {
 				objs = append(objs, obj)
 			}
 		}
@@ -100,11 +105,11 @@ func printObj(obj interface{}) string {
 
 func render(text string, packages map[string]*ast.Package) string {
 	funcMap := template.FuncMap{
-		"ToUpper":   strings.ToUpper,
-		"ToLower":   strings.ToLower,
-		"ToTitle":   strings.ToTitle,
-		"FindTypes": findTypes,
-		"PrintObj":  printObj,
+		"ToUpper":     strings.ToUpper,
+		"ToLower":     strings.ToLower,
+		"ToTitle":     strings.ToTitle,
+		"FindStructs": findStructs,
+		"PrintObj":    printObj,
 	}
 	tmpl, err := template.New("render").Funcs(funcMap).Parse(text)
 	if err != nil {
