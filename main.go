@@ -16,6 +16,14 @@ import (
 
 //TEST COMMENT - DO NOT REMOVE
 
+type TestStruct1 struct {
+	Test int
+}
+
+type TestStruct2 struct {
+	Test string
+}
+
 func findFiles(root string) ([]string, error) {
 	files := make([]string, 0)
 	err := filepath.Walk(root, func(path string, f os.FileInfo, err error) error {
@@ -74,21 +82,29 @@ func readTemplate(path string) string {
 	return string(data)
 }
 
-func findFirstType(scope *ast.Scope) *ast.Object {
-	for _, obj := range scope.Objects {
-		if obj.Kind == ast.Typ {
-			return obj
+func findTypes(pkg *ast.Package) []*ast.Object {
+	objs := make([]*ast.Object, 0)
+	for _, file := range pkg.Files {
+		for _, obj := range file.Scope.Objects {
+			if obj.Kind == ast.Typ {
+				objs = append(objs, obj)
+			}
 		}
 	}
-	return nil
+	return objs
+}
+
+func printObj(obj interface{}) string {
+	return fmt.Sprintf("obj %#v", obj)
 }
 
 func render(text string, packages map[string]*ast.Package) string {
 	funcMap := template.FuncMap{
-		"ToUpper":       strings.ToUpper,
-		"ToLower":       strings.ToLower,
-		"ToTitle":       strings.ToTitle,
-		"FindFirstType": findFirstType,
+		"ToUpper":   strings.ToUpper,
+		"ToLower":   strings.ToLower,
+		"ToTitle":   strings.ToTitle,
+		"FindTypes": findTypes,
+		"PrintObj":  printObj,
 	}
 	tmpl, err := template.New("render").Funcs(funcMap).Parse(text)
 	if err != nil {
