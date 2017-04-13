@@ -24,6 +24,8 @@ type TestStruct2 struct {
 	Test string
 }
 
+var TestVar1 string = "testvar1"
+
 func findFiles(root string) ([]string, error) {
 	files := make([]string, 0)
 	err := filepath.Walk(root, func(path string, f os.FileInfo, err error) error {
@@ -99,6 +101,17 @@ func findStructs(pkg *ast.Package) []*ast.Object {
 	return objs
 }
 
+func findVar(pkg *ast.Package, name string) *ast.Object {
+	for _, file := range pkg.Files {
+		for _, obj := range file.Scope.Objects {
+			if obj.Kind == ast.Var && obj.Name == name {
+				return obj
+			}
+		}
+	}
+	return nil
+}
+
 func printObj(obj interface{}) string {
 	return fmt.Sprintf("obj %#v", obj)
 }
@@ -109,6 +122,7 @@ func render(text string, packages map[string]*ast.Package) string {
 		"ToLower":     strings.ToLower,
 		"ToTitle":     strings.ToTitle,
 		"FindStructs": findStructs,
+		"FindVar":     findVar,
 		"PrintObj":    printObj,
 	}
 	tmpl, err := template.New("render").Funcs(funcMap).Parse(text)
