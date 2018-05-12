@@ -3,7 +3,7 @@ gengen
 
 Little go:generate tool for quick "generics" (using templates).
 
-###Usage
+### Usage
 ```
 Usage of gengen:
   -d string
